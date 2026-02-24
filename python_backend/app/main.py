@@ -14,6 +14,7 @@ configure_logging(settings.log_level)
 log = get_logger('energy-intel-api')
 
 app = FastAPI(title='Energy Market Intelligence API', version='0.2.0')
+app = FastAPI(title='Energy Market Intelligence API', version='0.1.0')
 matcher = FacilityMatcher()
 breaker = CircuitBreaker(fail_max=settings.breaker_fail_max, reset_timeout=settings.breaker_reset_timeout_s)
 facilities = []
