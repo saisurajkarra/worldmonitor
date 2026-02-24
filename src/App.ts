@@ -81,6 +81,7 @@ import {
   PopulationExposurePanel,
   InvestmentsPanel,
   LanguageSelector,
+  CompetitorAnalysisPanel,
 } from '@/components';
 import type { SearchResult } from '@/components/SearchModal';
 import { collectStoryData } from '@/services/story-data';
@@ -2354,6 +2355,10 @@ export class App {
     const liveWebcamsPanel = new LiveWebcamsPanel();
     this.panels['live-webcams'] = liveWebcamsPanel;
 
+    const competitorAnalysisPanel = new CompetitorAnalysisPanel();
+    this.panels['competitor-analysis'] = competitorAnalysisPanel;
+    void competitorAnalysisPanel.refresh();
+
     // Tech Events Panel (tech variant only - but create for all to allow toggling)
     this.panels['events'] = new TechEventsPanel('events');
 
@@ -4618,6 +4623,9 @@ export class App {
     // Always refresh news, markets, predictions, pizzint
     this.scheduleRefresh('news', () => this.loadNews(), REFRESH_INTERVALS.feeds);
     this.scheduleRefresh('markets', () => this.loadMarkets(), REFRESH_INTERVALS.markets);
+    this.scheduleRefresh('competitor-analysis', async () => {
+      await (this.panels['competitor-analysis'] as CompetitorAnalysisPanel | undefined)?.refresh();
+    }, 10 * 60 * 1000);
     this.scheduleRefresh('predictions', () => this.loadPredictions(), REFRESH_INTERVALS.predictions);
     this.scheduleRefresh('pizzint', () => this.loadPizzInt(), 10 * 60 * 1000);
 
