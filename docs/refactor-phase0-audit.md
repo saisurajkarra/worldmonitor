@@ -92,4 +92,3 @@ Delete components tied to removed modules (examples include):
 3. `server/worldmonitor/news/v1/handler.ts`
 4. `src/services/live-news.ts`
 5. `src/components/WorldMonitorTab.ts`
-

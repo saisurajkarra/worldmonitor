@@ -42,3 +42,7 @@ npm install
 - `POST /api/energy/v1/facilities/reload`
 - `GET /api/energy/v1/news/matches?limit=100`
 - `GET /api/energy/v1/competitor/matrix`
+- `GET /api/energy/v1/competitor/discovery?limit=20`
+
+## News API compatibility
+The backend continues to use a single remote news provider URL/key (`NEWS_API_URL`, `NEWS_API_KEY`) in the same operational style as existing worldmonitor fetch-based integrations: one configurable upstream endpoint, server-side filtering/querying, and frontend consumption via typed fetch services.

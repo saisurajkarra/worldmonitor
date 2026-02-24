@@ -5,13 +5,13 @@ import httpx
 from .matching import Article
 
 
-def fetch_news(news_api_url: str, api_key: str, timeout_s: float) -> list[Article]:
+def fetch_news(news_api_url: str, api_key: str, timeout_s: float, query: str | None = None, page_size: int = 100) -> list[Article]:
     headers = {'Authorization': f'Bearer {api_key}'}
     params = {
-        'q': '(biomethane OR renewable natural gas OR wastewater methane OR hydrogen purification OR helium plant)',
+        'q': query or '(biomethane OR renewable natural gas OR wastewater methane OR hydrogen purification OR helium plant)',
         'language': 'en',
         'sortBy': 'publishedAt',
-        'pageSize': 100,
+        'pageSize': max(1, min(page_size, 100)),
     }
     with httpx.Client(timeout=timeout_s) as client:
         res = client.get(news_api_url, headers=headers, params=params)
