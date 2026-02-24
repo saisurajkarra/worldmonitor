@@ -13,7 +13,7 @@ from .telemetry import configure_logging, get_logger
 configure_logging(settings.log_level)
 log = get_logger('energy-intel-api')
 
-app = FastAPI(title='Energy Market Intelligence API', version='0.1.0')
+app = FastAPI(title='Energy Market Intelligence API', version='0.2.0')
 matcher = FacilityMatcher()
 breaker = CircuitBreaker(fail_max=settings.breaker_fail_max, reset_timeout=settings.breaker_reset_timeout_s)
 facilities = []
@@ -67,3 +67,26 @@ def competitor_matrix() -> list[dict]:
     except Exception as exc:  # noqa: BLE001
         log.error('competitor_matrix_failed', error=str(exc))
         raise HTTPException(status_code=500, detail='Competitor extraction failed') from exc
+
+
+@app.get('/api/energy/v1/competitor/discovery')
+def competitor_discovery(limit: int = 20) -> list[dict]:
+    query = '((RFP OR RFQ OR proposal OR EPC OR FEED OR procurement) AND (biogas OR biomethane OR RNG OR hydrogen OR helium membrane))'
+    try:
+        articles = breaker.call(fetch_news, settings.news_api_url, settings.news_api_key, settings.request_timeout_s, query, min(100, max(limit, 20)))
+    except CircuitBreakerError as exc:
+        raise HTTPException(status_code=503, detail='Discovery circuit open') from exc
+    except Exception as exc:  # noqa: BLE001
+        log.error('competitor_discovery_failed', error=str(exc))
+        raise HTTPException(status_code=502, detail='Competitor discovery failed') from exc
+
+    return [
+        {
+            'title': a.title,
+            'url': a.url,
+            'source': a.source,
+            'summary': a.content[:350],
+            'published_at': None,
+        }
+        for a in articles[:limit]
+    ]
